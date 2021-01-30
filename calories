@@ -1,0 +1,51 @@
+data_cal_wt <- read.csv("calories_consumed.csv")
+View("data_cal_wt")
+attach(data_cal_wt)
+
+plot(data_cal_wt)
+summary(data_cal_wt)
+cor(Weight.gained..grams.,Calories.Consumed)
+
+reg <- lm(Weight.gained..grams.~ Calories.Consumed)
+summary(reg)
+
+confint(reg,level=0.95)
+predict(reg,interval="predict")
+
+# transform the variables to check whether the predicted values are better
+reg_sqrt <- lm(Weight.gained..grams.~ sqrt(Calories.Consumed))
+summary(reg_sqrt)
+
+confint(reg_sqrt,level=0.95)
+predict(reg_sqrt,interval="predict")
+
+# transform the variables to check whether the predicted values are better
+reg_log1 <- lm(Weight.gained..grams.~ log(Calories.Consumed))
+summary(reg_log1)
+
+confint(reg_log1,level=0.95)
+predict(reg_log1,interval="predict")
+
+# transform the variables to check whether the predicted values are better
+reg_exp1 <- lm(log(Weight.gained..grams.)~ Calories.Consumed)
+summary(reg_exp1)
+
+confint(reg_exp1,level=0.95)
+predict(reg_exp1,interval="predict")
+
+# Result
+## Applying transformation is decreasing 
+#Multiple R Squared Value. 
+#So model doesnot need further transformation, 
+#Multiple R-squared:  0.8776
+
+predicted_Value <- predict(reg)
+predicted_Value
+Final <- cbind(calories_consumed=data_cal_wt$Calories.Consumed,weight_gained = data_cal_wt$Weight.gained..grams.,Pred_weight=predicted_Value)
+View(Final)
+
+rmse<-sqrt(mean((predicted_Value-Weight.gained..grams. )^2))
+rmse
+plot(reg)
+hist(residuals(reg)
+     
