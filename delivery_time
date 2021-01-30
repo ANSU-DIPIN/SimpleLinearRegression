@@ -1,0 +1,129 @@
+Q2 <-  read.csv("delivery_time.csv")  #Importing Data set #
+
+attach(Q2)
+View(Q2)
+
+# Column Names in given dataset Q2
+colnames(Q2) 
+
+# 1St Movement Business Decission(Mean,Meadian,Range)
+summary(Delivery.Time)
+summary(Sorting.Time)
+
+#Delivery.time having some +ve skewness
+# 2Nd movement Business Decision(Variance,Standard Deviation)
+
+var(Sorting.Time)
+var(Delivery.Time)
+sd(Sorting.Time)
+sd(Delivery.Time)
+
+# 3rd & 4th Business Decission(Skewness and Kurtosis)
+
+library(e1071)
+skewness(Delivery.Time)
+
+kurtosis((Delivery.Time))
+barplot(Delivery.Time)
+boxplot(Delivery.Time,horizontal = T)
+hist(Delivery.Time)
+
+qqnorm(Delivery.Time)
+qqline(Delivery.Time)
+skewness(Sorting.Time)
+kurtosis(Sorting.Time)
+barplot(Sorting.Time)
+hist(Sorting.Time)
+boxplot(Sorting.Time,horizontal = T )
+
+#Based on Boxplot we dont have outliears
+
+
+qqnorm(Sorting.Time)
+qqline(Sorting.Time)
+
+# Based on qqnorm we confirmed as Calories data 
+#is linearly Distributed.
+#Corelation Coefficient(r-value>0.85 Strong Corelation) 
+#value for X-axis and Y-axis
+cor(Q2$Delivery.Time,Q2$Sorting.Time)
+
+#Based on this value cor value we can build 82% Accurate Model
+plot(Q2)  
+
+# Scatter Plot is used for relation between two variables.
+#Based on this scatter plot 
+#we Can expect this model variables are having  
+#+ve Strong Corelation 
+# we may have to do transformation of variables for better R-squared value
+# Applying transformations
+Model2 <- lm(Delivery.Time ~ Sorting.Time)
+summary(Model2)
+
+#Here R^2 value is 0.68 so we need some transformations
+Model2t <- lm(log(Delivery.Time) ~ log(Sorting.Time))
+summary(Model2t)
+
+# Based on Summary we can tell like intercept(B0) is 
+#Symentric and sortingTime(B1) also Symentric.
+#So we can use these two values(B0,B1) in our dataset.
+
+#R^2 value also Having 0.77 
+#if R^2 Value >0.8 we tell as this is Strong  Model
+
+# Logarthmic transformation
+reg_log<-lm(Delivery.Time~log(Sorting.Time))  # Regression using logarthmic transformation
+summary(reg_log)
+confint(reg_log,level=0.95)
+predict(reg_log,interval="predict")
+# Multiple R-squared value for the above model is 0.6794
+# Adjusted R-squared:  0.6954 
+
+# we may have to do different transformation for a better R-squared value
+# Applying different transformations
+
+# Exponential model 
+reg_exp<-lm(log(Delivery.Time)~Sorting.Time) # regression using Exponential model
+summary(reg_exp)
+confint(reg_exp,level=0.95)
+exp(predict(reg_exp,interval="predict"))
+# Multiple R-squared value - 0.7109
+# Adjusted R SQuare Value - 0.6957 
+
+dt <- Delivery.Time
+st <- Sorting.Time
+
+# Quadratic model
+Q2[,"st_dt"] = st*st
+
+# Quadratic model
+quad_mod <- lm(Delivery.Time~Sorting.Time+I(Sorting.Time^2),data=Q2)
+summary(quad_mod)
+confint(quad_mod,level=0.95)
+predict(quad_mod,interval="predict")
+# Adjusted R-Squared = 0.6594
+#Multiple R -Squared Value = 0.6934
+
+# Cubic model
+poly_mod <- lm(Delivery.Time~Sorting.Time+I(Sorting.Time^2)+I(Sorting.Time^3),data=Q2)
+summary(poly_mod) # 0.9636
+confint(poly_mod,level=0.95)
+predict(poly_mod,interval="predict")
+# Adjusted R-Squared = 0.6511 
+#Multiple R -Squared Value = 0.7034
+
+#Model2t isd better
+Model2t <- lm(log(Delivery.Time) ~ log(Sorting.Time))
+summary(Model2t)
+#Multiple R-squared:  0.7722,	Adjusted R-squared:  0.7602
+
+predicted_Value <- predict(Model2t)
+predicted_Value
+
+Final <- cbind(sortingTime=Q2$Sorting.Time,deliveryTime = Q2$Delivery.Time,Pred_del_time=predicted_Value)
+View(Final)
+
+rmse<-sqrt(mean((predicted_Value-dt)^2))
+rmse
+plot(Model2t)
+hist(residuals(Model2t)) # close to normal distribution
